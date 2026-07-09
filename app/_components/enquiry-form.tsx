@@ -1,5 +1,10 @@
-type EnquiryFormProps = {
-  email: string;
+"use client";
+
+import { type FormEvent, useRef, useState } from "react";
+
+type SubmissionState = {
+  kind: "idle" | "success" | "error";
+  message: string;
 };
 
 const equipmentCategories = [
@@ -35,13 +40,83 @@ function ArrowIcon() {
   );
 }
 
-export function EnquiryForm({ email }: EnquiryFormProps) {
-  const mailtoHref = `mailto:${email}?subject=Secondary-market%20equipment%20discussion`;
+export function EnquiryForm() {
+  const formRef = useRef<HTMLFormElement>(null);
+  const isSubmittingRef = useRef(false);
+  const [submissionState, setSubmissionState] = useState<SubmissionState>({
+    kind: "idle",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fieldClassName =
     "mt-2 min-h-12 w-full border border-[#151512]/18 bg-[#f9f5ec] px-4 text-[#151512] outline-none transition focus:border-[#151512] focus:ring-2 focus:ring-[#7d8d76]";
 
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (isSubmittingRef.current) {
+      return;
+    }
+
+    const form = event.currentTarget;
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    isSubmittingRef.current = true;
+    setIsSubmitting(true);
+    setSubmissionState({ kind: "idle", message: "" });
+
+    try {
+      const formData = new FormData(form);
+
+      const response = await fetch("/api/enquiries", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+      const result = (await response.json()) as { ok?: boolean; message?: string };
+
+      if (!response.ok || !result.ok) {
+        setSubmissionState({
+          kind: "error",
+          message: result.message ?? "We could not submit this enquiry. Please try again.",
+        });
+        return;
+      }
+
+      formRef.current?.reset();
+      setSubmissionState({
+        kind: "success",
+        message: result.message ?? "Thanks. Your enquiry has been submitted.",
+      });
+    } catch {
+      setSubmissionState({
+        kind: "error",
+        message: "We could not submit this enquiry. Please try again.",
+      });
+    } finally {
+      isSubmittingRef.current = false;
+      setIsSubmitting(false);
+    }
+  }
+
   return (
-    <form action={mailtoHref} method="post" encType="text/plain" className="border border-[#151512]/12 bg-[#e7dfcf] p-6 sm:p-8">
+    <form
+      ref={formRef}
+      action="/api/enquiries"
+      method="post"
+      className="border border-[#151512]/12 bg-[#e7dfcf] p-6 sm:p-8"
+      onSubmit={handleSubmit}
+    >
+      <div className="hidden" aria-hidden="true">
+        <label>
+          Website
+          <input name="website" type="text" tabIndex={-1} autoComplete="off" />
+        </label>
+      </div>
       <fieldset>
         <legend className="text-sm font-medium text-[#25251f]">I&apos;m looking to</legend>
         <div className="mt-2 grid gap-3 sm:grid-cols-2">
@@ -139,11 +214,20 @@ export function EnquiryForm({ email }: EnquiryFormProps) {
       </label>
       <button
         type="submit"
+        disabled={isSubmitting}
         className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-3 bg-[#151512] px-6 text-sm font-medium text-[#f4efe5] outline-none transition-colors hover:bg-[#2d342c] focus-visible:ring-2 focus-visible:ring-[#7d8d76] focus-visible:ring-offset-4 focus-visible:ring-offset-[#e7dfcf] sm:w-auto"
       >
-        Send enquiry
+        {isSubmitting ? "Sending..." : "Send enquiry"}
         <ArrowIcon />
       </button>
+      <p
+        aria-live="polite"
+        className={`mt-4 text-sm ${
+          submissionState.kind === "error" ? "text-[#7a241d]" : "text-[#2f5e3a]"
+        }`}
+      >
+        {submissionState.message}
+      </p>
     </form>
   );
 }

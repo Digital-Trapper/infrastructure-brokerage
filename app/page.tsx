@@ -261,7 +261,7 @@ export default function Home() {
             We would be interested in discussing potential secondary-market routes for surplus equipment.
           </p>
         </div>
-        <EnquiryForm email={siteConfig.email} />
+        <EnquiryForm />
       </section>
 
       <footer className="border-t border-[#151512]/10 px-5 py-10 sm:px-8">
