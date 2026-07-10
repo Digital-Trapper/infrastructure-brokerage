@@ -51,7 +51,14 @@ main
 - Vercel production environment variables configured: RESEND_API_KEY, ENQUIRY_FROM_EMAIL, ENQUIRY_TO_EMAIL
 - Production enquiry form test completed successfully
 - Enquiries now arrive at deals@gephyramarkets.com
+- Automated confirmation email to enquiry submitters implemented
+- Submitters receive a confirmation email after successful form submission
+- Production confirmation email test completed successfully
 - Lead capture is live
+- Full lead capture flow is live end-to-end:
+  - website form submission
+  - internal lead email
+  - submitter confirmation email
 - Form accessibility and semantics reviewed
 - Feature branch workflow introduced
 - Separate Codex builder and reviewer workflow introduced
@@ -65,6 +72,7 @@ main
 The enquiry form currently:
 - delivers production enquiries via Resend
 - sends enquiries to deals@gephyramarkets.com
+- sends automated confirmation emails to submitters after successful form submission
 - contains required fields
 - has reviewed accessibility structure
 
@@ -77,34 +85,37 @@ Currently not implemented:
 - Backend enquiry persistence
 - Supabase integration
 - Enquiry idempotency
-- Automated confirmation email to the submitter after successful enquiry submission
 
 ## Next Planned Feature
 
-Automated confirmation email to the submitter after successful enquiry submission.
+Outreach readiness:
+- Privacy policy / basic legal trust layer
+- Footer/contact email check
+- First lead list
+- Outreach copy
 
 ## Next PR
 
-Supabase integration
+Outreach readiness
 
 Goal:
-Introduce the backend foundation for persisted enquiries.
+Prepare the live site and operating materials for initial outbound lead generation.
 
 Expected scope:
-- Add Supabase project configuration
-- Prepare environment variable handling
-- Define initial enquiry persistence path
+- Add privacy policy / basic legal trust layer
+- Check footer and contact email details
+- Prepare first lead list
+- Draft initial outreach copy
 
 ## Planned Later Work
 
 Likely sequence:
 
-1. Supabase integration
-2. Enquiry persistence
-3. Idempotency protection
-4. Confirmation state
-5. Resend transactional email
-6. Further production hardening
+1. Outreach readiness
+2. Supabase integration
+3. Enquiry persistence
+4. Idempotency protection
+5. Further production hardening
 
 ## Working Rules
 
