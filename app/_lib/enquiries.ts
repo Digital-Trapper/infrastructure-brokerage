@@ -134,6 +134,38 @@ export function buildEnquiryEmail(submission: EnquirySubmission, from: string, t
   };
 }
 
+export function buildEnquiryConfirmationEmail(submission: EnquirySubmission, from: string): EmailPayload {
+  const subject = "Gephyra Markets has received your enquiry";
+  const summary = [
+    `Enquiry type: ${enquiryTypeLabels[submission.enquiryType]}`,
+    `Equipment type: ${assetCategoryLabels[submission.assetCategory]}`,
+    `Approximate deal value: ${approximateValueLabels[submission.approximateValue]}`,
+    `Company: ${submission.company || "Not provided"}`,
+    `Contact email: ${submission.email}`,
+  ];
+  const text = [
+    `Hello ${submission.name},`,
+    "",
+    "Thank you for contacting Gephyra Markets. We have received your enquiry.",
+    "",
+    "We will review the requirement and respond if there is a relevant buyer or seller opportunity.",
+    "",
+    "Submitted summary:",
+    ...summary,
+    "",
+    "Regards,",
+    "Gephyra Markets",
+  ].join("\n");
+
+  return {
+    from,
+    to: submission.email,
+    replyTo: from,
+    subject,
+    text,
+  };
+}
+
 export function validateEnquiryFormData(formData: FormData): ValidationResult {
   const website = readText(formData, "website");
 
@@ -239,6 +271,25 @@ export async function deliverEnquiry(
         status: 502,
         error: clientSafeDeliveryError,
       };
+    }
+
+    try {
+      const confirmationPayload = buildEnquiryConfirmationEmail(submission, from);
+      const confirmationResult = await client.emails.send(confirmationPayload);
+
+      if (confirmationResult.error) {
+        console.error("Resend rejected enquiry confirmation email.", {
+          error: formatProviderError(confirmationResult.error),
+        });
+
+        return { ok: true, id: result.data.id };
+      }
+
+      if (!confirmationResult.data?.id) {
+        console.error("Resend did not return an email id for enquiry confirmation delivery.");
+      }
+    } catch (error) {
+      console.error("Resend enquiry confirmation delivery failed unexpectedly.", { error });
     }
 
     return { ok: true, id: result.data.id };

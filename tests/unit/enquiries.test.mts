@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
 
 import {
+  buildEnquiryConfirmationEmail,
   buildEnquiryEmail,
   deliverEnquiry,
   type EnquiryEmailClient,
@@ -79,6 +80,26 @@ test("builds an email containing all submitted enquiry details", () => {
   assert.match(email.text, /We are looking for BESS equipment\./);
 });
 
+test("builds a confirmation email for the submitter", () => {
+  const email = buildEnquiryConfirmationEmail(
+    validSubmission,
+    "Gephyra Markets <enquiries@example.com>",
+  );
+
+  assert.equal(email.from, "Gephyra Markets <enquiries@example.com>");
+  assert.equal(email.to, "test@example.com");
+  assert.equal(email.replyTo, "Gephyra Markets <enquiries@example.com>");
+  assert.equal(email.subject, "Gephyra Markets has received your enquiry");
+  assert.match(email.text, /Hello Test User,/);
+  assert.match(email.text, /We have received your enquiry\./);
+  assert.match(email.text, /respond if there is a relevant buyer or seller opportunity/);
+  assert.match(email.text, /Enquiry type: Buy equipment/);
+  assert.match(email.text, /Equipment type: BESS \/ battery storage/);
+  assert.match(email.text, /Approximate deal value: £50k-£250k/);
+  assert.match(email.text, /Company: Test Company/);
+  assert.match(email.text, /Contact email: test@example.com/);
+});
+
 test("returns configuration failure before calling Resend when env is missing", async () => {
   clearEnv();
 
@@ -99,37 +120,60 @@ test("returns configuration failure before calling Resend when env is missing", 
   });
 });
 
-test("returns success only after Resend confirms a send id", async () => {
+test("returns success after internal notification and confirmation both send", async () => {
   configureEnv();
 
+  const payloads: unknown[] = [];
   const client: EnquiryEmailClient = {
     emails: {
       send: async (payload) => {
-        assert.equal(payload.from, "Gephyra Markets <enquiries@example.com>");
-        assert.equal(payload.to, "leads@example.com");
-        assert.equal(payload.replyTo, "test@example.com");
-        assert.match(payload.text, /Requirement or asset:\nWe are looking for BESS equipment\./);
+        payloads.push(payload);
 
-        return { data: { id: "email_123" } };
+        return { data: { id: `email_${payloads.length}` } };
       },
     },
   };
 
   assert.deepEqual(await deliverEnquiry(validSubmission, client), {
     ok: true,
-    id: "email_123",
+    id: "email_1",
   });
+  assert.equal(payloads.length, 2);
+
+  const [internalEmail, confirmationEmail] = payloads as Array<{
+    from: string;
+    to: string;
+    replyTo: string;
+    subject: string;
+    text: string;
+  }>;
+
+  assert.equal(internalEmail.from, "Gephyra Markets <enquiries@example.com>");
+  assert.equal(internalEmail.to, "leads@example.com");
+  assert.equal(internalEmail.replyTo, "test@example.com");
+  assert.match(internalEmail.text, /Requirement or asset:\nWe are looking for BESS equipment\./);
+
+  assert.equal(confirmationEmail.from, "Gephyra Markets <enquiries@example.com>");
+  assert.equal(confirmationEmail.to, "test@example.com");
+  assert.equal(confirmationEmail.replyTo, "Gephyra Markets <enquiries@example.com>");
+  assert.equal(confirmationEmail.subject, "Gephyra Markets has received your enquiry");
+  assert.match(confirmationEmail.text, /Thank you for contacting Gephyra Markets/);
 });
 
-test("returns provider failure when Resend rejects the send", async () => {
+test("returns provider failure when Resend rejects the internal notification", async () => {
   configureEnv();
 
+  let sendCount = 0;
   const client: EnquiryEmailClient = {
     emails: {
-      send: async () => ({
-        data: null,
-        error: { message: "Domain is not verified" },
-      }),
+      send: async () => {
+        sendCount += 1;
+
+        return {
+          data: null,
+          error: { message: "Domain is not verified" },
+        };
+      },
     },
   };
 
@@ -138,6 +182,7 @@ test("returns provider failure when Resend rejects the send", async () => {
     status: 502,
     error: "We could not submit this enquiry. Please try again.",
   });
+  assert.equal(sendCount, 1);
 });
 
 test("does not count a provider response without an id as success", async () => {
@@ -156,4 +201,32 @@ test("does not count a provider response without an id as success", async () => 
     status: 502,
     error: "We could not submit this enquiry. Please try again.",
   });
+});
+
+test("returns success when confirmation fails after internal notification succeeds", async () => {
+  configureEnv();
+
+  const payloads: unknown[] = [];
+  const client: EnquiryEmailClient = {
+    emails: {
+      send: async () => {
+        payloads.push({});
+
+        if (payloads.length === 2) {
+          return {
+            data: null,
+            error: { message: "Confirmation recipient rejected" },
+          };
+        }
+
+        return { data: { id: "internal_email_123" } };
+      },
+    },
+  };
+
+  assert.deepEqual(await deliverEnquiry(validSubmission, client), {
+    ok: true,
+    id: "internal_email_123",
+  });
+  assert.equal(payloads.length, 2);
 });
