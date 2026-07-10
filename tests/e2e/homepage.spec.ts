@@ -46,6 +46,10 @@ test.describe("homepage", () => {
     ).toBeVisible();
 
     await expect(page.getByRole("link", { name: "Discuss an asset" }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "deal@gephyramarkets.com" })).toHaveAttribute(
+      "href",
+      "mailto:deal@gephyramarkets.com",
+    );
 
     const form = page.locator('form[action="/api/enquiries"]');
     await expect(form).toBeVisible();

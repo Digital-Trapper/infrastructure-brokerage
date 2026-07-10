@@ -3,7 +3,7 @@ import { EnquiryForm } from "./_components/enquiry-form";
 const siteConfig = {
   companyName: "Gephyra Markets",
   descriptor: "Secondary Markets for Critical Infrastructure",
-  email: "contact@gephyramarkets.co.uk",
+  email: "deal@gephyramarkets.com",
   location: "London, United Kingdom",
 };
 
@@ -115,7 +115,7 @@ export default function Home() {
             href="#top"
             className="outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#7d8d76] focus-visible:ring-offset-4 focus-visible:ring-offset-[#f4efe5]"
           >
-            <span className="block text-sm font-semibold uppercase tracking-[0.22em] text-[#151512]">
+            <span className="block text-base font-semibold uppercase tracking-[0.18em] text-[#151512] sm:text-lg">
               {siteConfig.companyName}
             </span>
           </a>
@@ -142,10 +142,10 @@ export default function Home() {
       <section id="top" className="border-b border-[#151512]/10">
         <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:py-28">
           <div>
-            <p className="mb-8 max-w-xl text-sm uppercase tracking-[0.26em] text-[#737065]">
+            <p className="mb-8 max-w-xl text-base font-semibold uppercase tracking-[0.18em] text-[#4b4a43]">
               {siteConfig.descriptor}
             </p>
-            <h1 className="max-w-4xl text-5xl font-semibold leading-[0.98] text-[#151512] sm:text-6xl lg:text-7xl">
+            <h1 className="max-w-4xl text-5xl font-bold leading-[1.02] text-[#151512] sm:text-6xl lg:text-7xl">
               Unlocking secondary-market value from surplus energy infrastructure
             </h1>
             <p className="mt-8 max-w-2xl text-lg leading-8 text-[#4b4a43] sm:text-xl">
@@ -182,8 +182,8 @@ export default function Home() {
       <section id="equipment" className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <p className="text-sm uppercase tracking-[0.24em] text-[#7d8d76]">Equipment</p>
-            <h2 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#55604f]">Equipment</p>
+            <h2 className="mt-4 text-[2.65rem] font-bold leading-[1.08] sm:text-5xl">
               Specialist focus across energy storage and critical power infrastructure
             </h2>
           </div>
@@ -201,8 +201,8 @@ export default function Home() {
       <section id="approach" className="border-y border-[#151512]/10 bg-[#e7dfcf] px-5 py-20 sm:px-8 sm:py-28">
         <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
-            <p className="text-sm uppercase tracking-[0.24em] text-[#697661]">Approach</p>
-            <h2 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">A measured route to market</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#55604f]">Approach</p>
+            <h2 className="mt-4 text-[2.65rem] font-bold leading-[1.08] sm:text-5xl">A measured route to market</h2>
           </div>
           <div className="mt-14 grid gap-px border border-[#151512]/12 bg-[#151512]/12 lg:grid-cols-3">
             {processStages.map((stage, index) => (
@@ -218,8 +218,8 @@ export default function Home() {
 
       <section id="partners" className="mx-auto grid max-w-7xl gap-12 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
         <div>
-          <p className="text-sm uppercase tracking-[0.24em] text-[#7d8d76]">Who We Work With</p>
-          <h2 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#55604f]">Who We Work With</p>
+          <h2 className="mt-4 text-[2.65rem] font-bold leading-[1.08] sm:text-5xl">
             Built for asset-side, project-side and capital-side conversations
           </h2>
         </div>
@@ -234,7 +234,7 @@ export default function Home() {
 
       <section className="bg-[#151512] px-5 py-20 text-[#f4efe5] sm:px-8 sm:py-28">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1fr_1.1fr]">
-          <h2 className="text-4xl font-semibold leading-tight sm:text-5xl">
+          <h2 className="text-[2.65rem] font-bold leading-[1.08] sm:text-5xl">
             Replacement does not always mean end of commercial utility
           </h2>
           <div className="space-y-6 text-lg leading-8 text-[#d3c9b7]">
@@ -253,8 +253,8 @@ export default function Home() {
 
       <section id="contact" className="mx-auto grid max-w-7xl gap-12 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
-          <p className="text-sm uppercase tracking-[0.24em] text-[#7d8d76]">Contact</p>
-          <h2 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#55604f]">Contact</p>
+          <h2 className="mt-4 text-[2.65rem] font-bold leading-[1.08] sm:text-5xl">
             Planning an upgrade, repowering programme or equipment replacement?
           </h2>
           <p className="mt-7 max-w-xl text-lg leading-8 text-[#5d5a50]">
@@ -271,12 +271,19 @@ export default function Home() {
             <p className="mt-2 text-[#25251f]">{siteConfig.descriptor}</p>
             <p className="mt-2">
               {siteConfig.location} ·{" "}
-              <a className="underline-offset-4 hover:underline" href={`mailto:${siteConfig.email}`}>
+              <a
+                className="outline-none underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-[#7d8d76] focus-visible:ring-offset-4 focus-visible:ring-offset-[#f4efe5]"
+                href={`mailto:${siteConfig.email}`}
+              >
                 {siteConfig.email}
               </a>
             </p>
           </div>
-          <a id="privacy-note" className="underline-offset-4 hover:underline" href={`mailto:${siteConfig.email}?subject=Privacy%20enquiry`}>
+          <a
+            id="privacy-note"
+            className="outline-none underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-[#7d8d76] focus-visible:ring-offset-4 focus-visible:ring-offset-[#f4efe5]"
+            href={`mailto:${siteConfig.email}?subject=Privacy%20enquiry`}
+          >
             Privacy
           </a>
         </div>
