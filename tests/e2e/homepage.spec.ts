@@ -12,14 +12,14 @@ test.describe("homepage", () => {
     message: "We are looking for BESS equipment.",
   };
 
-  async function fillValidEnquiryForm(page: Page, message: string) {
+  async function fillValidEnquiryForm(page: Page, message: string, email = "test@example.com") {
     const form = page.locator('form[action="/api/enquiries"]');
     await form.getByRole("radio", { name: /buy equipment/i }).check();
     await form.getByLabel(/equipment type/i).selectOption("bess");
     await form.getByLabel(/approximate deal value/i).selectOption("50k_250k");
     await form.getByLabel(/^name$/i).fill("Test User");
     await form.getByLabel(/company/i).fill("Test Company");
-    await form.getByLabel(/^email$/i).fill("test@example.com");
+    await form.getByLabel(/^email$/i).fill(email);
     await form.getByLabel(/phone/i).fill("+44 20 7946 0018");
     await form.getByLabel(/tell us about the requirement or asset/i).fill(message);
 
@@ -158,12 +158,31 @@ test.describe("homepage", () => {
   });
 
   test("shows genuine success after the provider confirms delivery", async ({ page }) => {
+    const email = "confirmation-count@example.com";
+    const countMarker = `Contact email: ${email}`;
+    const beforeConfirmationCount = await getMockSendCount(countMarker);
+
     await page.goto("/");
 
-    const form = await fillValidEnquiryForm(page, "We are looking for BESS equipment.");
+    const form = await fillValidEnquiryForm(page, "We are looking for BESS equipment.", email);
     await form.getByRole("button", { name: /send enquiry/i }).click();
 
     await expect(form.getByText("Thanks. Your enquiry has been submitted.")).toBeVisible();
+    expect(await getMockSendCount(countMarker)).toBe(beforeConfirmationCount + 1);
+  });
+
+  test("still shows success when confirmation delivery fails after internal delivery", async ({ page }) => {
+    await page.goto("/");
+
+    const form = await fillValidEnquiryForm(
+      page,
+      "We are looking for BESS equipment.",
+      "confirmation-failure@example.com",
+    );
+    await form.getByRole("button", { name: /send enquiry/i }).click();
+
+    await expect(form.getByText("Thanks. Your enquiry has been submitted.")).toBeVisible();
+    await expect(form.getByText("We could not submit this enquiry. Please try again.")).toHaveCount(0);
   });
 
   test("shows a clear error when the provider rejects delivery", async ({ page }) => {
@@ -195,11 +214,12 @@ test.describe("homepage", () => {
 
   test("guards against rapid double submission in the browser", async ({ page }) => {
     const marker = "Rapid double submit marker";
+    const email = "rapid-double-submit@example.com";
     const beforeCount = await getMockSendCount(marker);
 
     await page.goto("/");
 
-    const form = await fillValidEnquiryForm(page, `${marker}: We are looking for BESS equipment.`);
+    const form = await fillValidEnquiryForm(page, `${marker}: We are looking for BESS equipment.`, email);
     await form.getByRole("button", { name: /send enquiry/i }).dblclick();
 
     await expect(form.getByText("Thanks. Your enquiry has been submitted.")).toBeVisible();

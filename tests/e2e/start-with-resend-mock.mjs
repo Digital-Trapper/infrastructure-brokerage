@@ -23,6 +23,10 @@ function sendJson(response, statusCode, body) {
   response.end(JSON.stringify(body));
 }
 
+function recordAcceptedSend(text) {
+  sendCountsByText.set(text, (sendCountsByText.get(text) ?? 0) + 1);
+}
+
 const resendMock = createServer(async (request, response) => {
   if (request.method === "GET" && request.url?.startsWith("/__resend-mock/count")) {
     const url = new URL(request.url, `http://127.0.0.1:${mockPort}`);
@@ -64,17 +68,27 @@ const resendMock = createServer(async (request, response) => {
 
   const body = JSON.parse(await readRequestBody(request));
   const text = body.text ?? "";
-  sendCountsByText.set(text, (sendCountsByText.get(text) ?? 0) + 1);
-  const requiredDetails = [
+  const submitterEmail = body.to === "leads@example.com" ? body.reply_to : body.to;
+  const requiredInternalDetails = [
     "New Gephyra Markets enquiry",
     "Enquiry type: Buy equipment",
     "Equipment type: BESS / battery storage",
     "Approximate deal value: £50k-£250k",
     "Name: Test User",
     "Company: Test Company",
-    "Email: test@example.com",
+    `Email: ${submitterEmail}`,
     "Phone / WhatsApp: +44 20 7946 0018",
     "Requirement or asset:",
+  ];
+  const requiredConfirmationDetails = [
+    "Thank you for contacting Gephyra Markets. We have received your enquiry.",
+    "We will review the requirement and respond if there is a relevant buyer or seller opportunity.",
+    "Submitted summary:",
+    "Enquiry type: Buy equipment",
+    "Equipment type: BESS / battery storage",
+    "Approximate deal value: £50k-£250k",
+    "Company: Test Company",
+    `Contact email: ${body.to}`,
   ];
 
   if (text.includes("Provider failure")) {
@@ -91,21 +105,51 @@ const resendMock = createServer(async (request, response) => {
     return;
   }
 
-  if (
-    body.from !== "Gephyra Markets <enquiries@example.com>" ||
-    body.to !== "leads@example.com" ||
-    body.reply_to !== "test@example.com" ||
-    !requiredDetails.every((detail) => text.includes(detail))
-  ) {
+  if (body.to === "confirmation-failure@example.com") {
     sendJson(response, 422, {
       name: "validation_error",
-      message: "Mock provider received an incomplete enquiry email",
+      message: "Mock provider rejected confirmation send",
       statusCode: 422,
     });
     return;
   }
 
-  sendJson(response, 200, { id: "email_mock_123" });
+  if (body.to === "leads@example.com") {
+    if (
+      body.from !== "Gephyra Markets <enquiries@example.com>" ||
+      typeof body.reply_to !== "string" ||
+      !body.reply_to.includes("@") ||
+      !requiredInternalDetails.every((detail) => text.includes(detail))
+    ) {
+      sendJson(response, 422, {
+        name: "validation_error",
+        message: "Mock provider received an incomplete enquiry email",
+        statusCode: 422,
+      });
+      return;
+    }
+
+    recordAcceptedSend(text);
+    sendJson(response, 200, { id: "email_mock_123" });
+    return;
+  }
+
+  if (
+    body.from !== "Gephyra Markets <enquiries@example.com>" ||
+    body.reply_to !== "Gephyra Markets <enquiries@example.com>" ||
+    body.subject !== "Gephyra Markets has received your enquiry" ||
+    !requiredConfirmationDetails.every((detail) => text.includes(detail))
+  ) {
+    sendJson(response, 422, {
+      name: "validation_error",
+      message: "Mock provider received an incomplete confirmation email",
+      statusCode: 422,
+    });
+    return;
+  }
+
+  recordAcceptedSend(text);
+  sendJson(response, 200, { id: "email_confirmation_mock_123" });
 });
 
 resendMock.listen(Number(mockPort), "127.0.0.1", () => {
