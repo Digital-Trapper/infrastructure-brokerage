@@ -1,6 +1,6 @@
 # Gephyra Markets — Project State
 
-Last updated: 2026-07-09
+Last updated: 2026-07-10
 
 ## Product
 
@@ -46,6 +46,12 @@ main
 - Cloudflare DNS configured
 - Enquiry form UI added
 - Enquiry form mailto flow added
+- Production enquiry delivery via Resend is live
+- Resend sending domain updates.gephyramarkets.com verified
+- Vercel production environment variables configured: RESEND_API_KEY, ENQUIRY_FROM_EMAIL, ENQUIRY_TO_EMAIL
+- Production enquiry form test completed successfully
+- Enquiries now arrive at deals@gephyramarkets.com
+- Lead capture is live
 - Form accessibility and semantics reviewed
 - Feature branch workflow introduced
 - Separate Codex builder and reviewer workflow introduced
@@ -57,9 +63,8 @@ main
 ## Current Engineering State
 
 The enquiry form currently:
-- uses a mailto action
-- uses method="post"
-- uses encType="text/plain"
+- delivers production enquiries via Resend
+- sends enquiries to deals@gephyramarkets.com
 - contains required fields
 - has reviewed accessibility structure
 
@@ -71,8 +76,12 @@ Playwright E2E currently:
 Currently not implemented:
 - Backend enquiry persistence
 - Supabase integration
-- Resend integration
 - Enquiry idempotency
+- Automated confirmation email to the submitter after successful enquiry submission
+
+## Next Planned Feature
+
+Automated confirmation email to the submitter after successful enquiry submission.
 
 ## Next PR
 
