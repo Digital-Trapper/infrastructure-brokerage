@@ -4,6 +4,17 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - "app/**"
+      - "tests/**"
+      - "package.json"
+      - "package-lock.json"
+      - "playwright.config.ts"
+      - ".github/workflows/playwright-e2e.yml"
+      - "tsconfig.json"
+      - "next.config.*"
+      - "eslint.config.*"
+      - "postcss.config.*"
 
 jobs:
   e2e:
