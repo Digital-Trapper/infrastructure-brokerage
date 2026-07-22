@@ -38,6 +38,7 @@ export type EnquiryEmailClient = {
 
 const enquiryTypes = new Set(["buyer", "seller"]);
 const assetCategories = new Set([
+  "generators",
   "bess",
   "ups",
   "data_centre",
@@ -65,6 +66,7 @@ const enquiryTypeLabels: Record<EnquirySubmission["enquiryType"], string> = {
 };
 
 const assetCategoryLabels: Record<string, string> = {
+  generators: "Generators",
   bess: "BESS / battery storage",
   ups: "UPS systems",
   data_centre: "Data centre equipment",

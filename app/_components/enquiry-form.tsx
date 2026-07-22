@@ -8,6 +8,7 @@ type SubmissionState = {
 };
 
 const equipmentCategories = [
+  { label: "Generators", value: "generators" },
   { label: "BESS / battery storage", value: "bess" },
   { label: "UPS systems", value: "ups" },
   { label: "Data centre equipment", value: "data_centre" },

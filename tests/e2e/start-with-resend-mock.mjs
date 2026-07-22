@@ -72,7 +72,6 @@ const resendMock = createServer(async (request, response) => {
   const requiredInternalDetails = [
     "New Gephyra Markets enquiry",
     "Enquiry type: Buy equipment",
-    "Equipment type: BESS / battery storage",
     "Approximate deal value: £50k-£250k",
     "Name: Test User",
     "Company: Test Company",
@@ -85,11 +84,14 @@ const resendMock = createServer(async (request, response) => {
     "We will review the requirement and respond if there is a relevant buyer or seller opportunity.",
     "Submitted summary:",
     "Enquiry type: Buy equipment",
-    "Equipment type: BESS / battery storage",
     "Approximate deal value: £50k-£250k",
     "Company: Test Company",
     `Contact email: ${body.to}`,
   ];
+  const hasSupportedEquipmentType = [
+    "Equipment type: BESS / battery storage",
+    "Equipment type: Generators",
+  ].some((detail) => text.includes(detail));
 
   if (text.includes("Provider failure")) {
     sendJson(response, 422, {
@@ -119,6 +121,7 @@ const resendMock = createServer(async (request, response) => {
       body.from !== "Gephyra Markets <enquiries@example.com>" ||
       typeof body.reply_to !== "string" ||
       !body.reply_to.includes("@") ||
+      !hasSupportedEquipmentType ||
       !requiredInternalDetails.every((detail) => text.includes(detail))
     ) {
       sendJson(response, 422, {
@@ -138,6 +141,7 @@ const resendMock = createServer(async (request, response) => {
     body.from !== "Gephyra Markets <enquiries@example.com>" ||
     body.reply_to !== "Gephyra Markets <enquiries@example.com>" ||
     body.subject !== "Gephyra Markets has received your enquiry" ||
+    !hasSupportedEquipmentType ||
     !requiredConfirmationDetails.every((detail) => text.includes(detail))
   ) {
     sendJson(response, 422, {

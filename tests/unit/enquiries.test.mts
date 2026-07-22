@@ -80,6 +80,30 @@ test("builds an email containing all submitted enquiry details", () => {
   assert.match(email.text, /We are looking for BESS equipment\./);
 });
 
+test("accepts generators and includes the category in enquiry emails", () => {
+  const formData = new FormData();
+  formData.set("enquiry_type", "seller");
+  formData.set("asset_category", "generators");
+  formData.set("approximate_value", "250k_1m");
+  formData.set("name", "Generator Supplier");
+  formData.set("email", "supplier@example.com");
+  formData.set("message", "We have a used 500 kVA generator available.");
+
+  const validation = validateEnquiryFormData(formData);
+  assert.equal(validation.ok, true);
+
+  if (!validation.ok) {
+    return;
+  }
+
+  const email = buildEnquiryEmail(
+    validation.submission,
+    "Gephyra Markets <enquiries@example.com>",
+    "leads@example.com",
+  );
+  assert.match(email.text, /Equipment type: Generators/);
+});
+
 test("builds a confirmation email for the submitter", () => {
   const email = buildEnquiryConfirmationEmail(
     validSubmission,
