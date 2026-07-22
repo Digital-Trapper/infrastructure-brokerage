@@ -12,10 +12,15 @@ test.describe("homepage", () => {
     message: "We are looking for BESS equipment.",
   };
 
-  async function fillValidEnquiryForm(page: Page, message: string, email = "test@example.com") {
+  async function fillValidEnquiryForm(
+    page: Page,
+    message: string,
+    email = "test@example.com",
+    assetCategory = "bess",
+  ) {
     const form = page.locator('form[action="/api/enquiries"]');
     await form.getByRole("radio", { name: /buy equipment/i }).check();
-    await form.getByLabel(/equipment type/i).selectOption("bess");
+    await form.getByLabel(/equipment type/i).selectOption(assetCategory);
     await form.getByLabel(/approximate deal value/i).selectOption("50k_250k");
     await form.getByLabel(/^name$/i).fill("Test User");
     await form.getByLabel(/company/i).fill("Test Company");
@@ -44,6 +49,21 @@ test.describe("homepage", () => {
         name: /unlocking secondary-market value from surplus energy infrastructure/i,
       }),
     ).toBeVisible();
+    await expect(page.getByText("Current market focus", { exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Used and surplus generators" })).toBeVisible();
+    await expect(
+      page.getByText(
+        /used, ex-rental and surplus diesel generators, with an initial focus on 400–550 kVA equipment for UK and export markets/i,
+      ),
+    ).toBeVisible();
+
+    const marketFocus = page.locator("section").filter({
+      has: page.getByRole("heading", { name: "Used and surplus generators" }),
+    });
+    await expect(marketFocus.getByRole("link", { name: "Discuss an asset" })).toHaveAttribute(
+      "href",
+      "#contact",
+    );
 
     await expect(page.getByRole("link", { name: "Discuss an asset" }).first()).toBeVisible();
     await expect(page.getByRole("link", { name: "deal@gephyramarkets.com" })).toHaveAttribute(
@@ -58,6 +78,9 @@ test.describe("homepage", () => {
     await expect(form.getByRole("radio", { name: /buy equipment/i })).toBeVisible();
     await expect(form.getByRole("radio", { name: /sell equipment/i })).toBeVisible();
     await expect(form.getByLabel(/equipment type/i)).toBeVisible();
+    await expect(
+      form.getByLabel(/equipment type/i).getByRole("option", { name: "Generators" }),
+    ).toHaveAttribute("value", "generators");
     await expect(form.getByLabel(/^name$/i)).toBeVisible();
     await expect(form.getByLabel(/^email$/i)).toBeVisible();
     await expect(form.getByLabel(/tell us about the requirement or asset/i)).toBeVisible();
@@ -168,7 +191,12 @@ test.describe("homepage", () => {
 
     await page.goto("/");
 
-    const form = await fillValidEnquiryForm(page, "We are looking for BESS equipment.", email);
+    const form = await fillValidEnquiryForm(
+      page,
+      "We have a used 500 kVA generator available.",
+      email,
+      "generators",
+    );
     await form.getByRole("button", { name: /send enquiry/i }).click();
 
     await expect(form.getByText("Thanks. Your enquiry has been submitted.")).toBeVisible();

@@ -172,6 +172,33 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="border-b border-[#151512]/10 bg-[#e7dfcf] px-5 py-16 sm:px-8 sm:py-20">
+        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#55604f]">
+              Current market focus
+            </p>
+            <h2 className="mt-4 text-[2.65rem] font-bold leading-[1.08] sm:text-5xl">
+              Used and surplus generators
+            </h2>
+          </div>
+          <div>
+            <p className="max-w-3xl text-lg leading-8 text-[#5d5a50]">
+              Gephyra Markets is currently developing supplier and buyer relationships for used,
+              ex-rental and surplus diesel generators, with an initial focus on 400–550 kVA equipment
+              for UK and export markets.
+            </p>
+            <a
+              href="#contact"
+              className="mt-8 inline-flex min-h-12 items-center justify-center gap-3 bg-[#151512] px-6 text-sm font-medium text-[#f4efe5] outline-none transition-colors hover:bg-[#2d342c] focus-visible:ring-2 focus-visible:ring-[#7d8d76] focus-visible:ring-offset-4 focus-visible:ring-offset-[#e7dfcf]"
+            >
+              Discuss an asset
+              <ArrowIcon />
+            </a>
+          </div>
+        </div>
+      </section>
+
       <section className="bg-[#151512] px-5 py-6 text-[#f4efe5] sm:px-8">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 text-sm uppercase tracking-[0.22em] text-[#d3c9b7] sm:flex-row sm:items-center sm:justify-between">
           <span>Supporting opportunities arising from repowering, augmentation, upgrades and asset retirement</span>
