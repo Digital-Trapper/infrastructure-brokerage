@@ -1,6 +1,6 @@
 # Gephyra Markets — Project State
 
-Last updated: 2026-07-10
+Last updated: 2026-07-22
 
 ## Product
 
@@ -66,6 +66,18 @@ main
 - Baseline Chromium homepage smoke coverage added
 - GitHub Actions E2E workflow added for pull requests targeting main
 - Playwright E2E + CI PR merged after checks passed, including Playwright E2E
+- Generator market-focus section added beneath the homepage hero
+- Generator positioning covers used, ex-rental and surplus diesel generators, initially focused on 400–550 kVA equipment for UK and export markets
+- Generator market-focus CTA links to the contact enquiry section
+- Generators added as an enquiry form option, with server validation and email-label support
+- Unit and Playwright coverage added for generator selection, validation and mocked email delivery
+- Generator market-focus feature independently reviewed with no blocking findings
+- Generator market-focus pre-merge validation completed successfully:
+  - `npm run test:unit` — 9/9 passed
+  - `npm run lint` — passed
+  - `npm run build` — passed
+  - `npm run test:e2e` — 12/12 passed
+  - `git diff --check` — passed
 
 ## Current Engineering State
 
@@ -73,13 +85,26 @@ The enquiry form currently:
 - delivers production enquiries via Resend
 - sends enquiries to deals@gephyramarkets.com
 - sends automated confirmation emails to submitters after successful form submission
+- offers Generators as an equipment type, supported by server validation and email labels
 - contains required fields
 - has reviewed accessibility structure
+
+The homepage currently:
+- includes a current-market-focus section beneath the hero
+- positions used, ex-rental and surplus diesel generators, initially focused on 400–550 kVA equipment for UK and export markets
+- links the generator CTA to the contact enquiry section
 
 Playwright E2E currently:
 - uses the local Next.js app via webServer
 - includes baseline Chromium homepage smoke coverage
+- covers generator selection, validation and mocked email delivery
 - runs in GitHub Actions on pull requests targeting main
+
+Outstanding follow-up:
+- Production deployment of the generator market-focus feature has not been recorded as verified
+- Live generator enquiry delivery and confirmation email delivery have not been recorded as verified
+- Low priority: click the generator CTA in Playwright and verify navigation to the contact section, beyond checking `href="#contact"`
+- Low priority: assert the generator confirmation-email label precisely enough to prevent regression to the BESS label
 
 Currently not implemented:
 - Backend enquiry persistence
